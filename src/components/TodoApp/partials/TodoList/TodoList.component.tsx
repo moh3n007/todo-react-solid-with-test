@@ -1,15 +1,21 @@
 // types
 import type { TodoListProps } from "@interfaces/todoProps";
 
+// components
+import TodoItem from "./partials/TodoItem.component";
+
 const TodoList: React.FC<TodoListProps> = (props) => {
-  const { todos, handleEdit, handleDelete } = props;
+  const { todos, handleEdit, handleDelete, editId } = props;
   return (
-    <ul>
+    <ul className="mt-4 flex flex-col gap-1">
       {todos.map((todo) => (
         <li key={todo.id}>
-          {todo.text}
-          <button onClick={() => handleEdit(todo.id)}>Edit</button>
-          <button onClick={() => handleDelete(todo.id)}>Delete</button>
+          <TodoItem
+            todo={todo}
+            onEdit={() => handleEdit(todo.id)}
+            onDelete={() => handleDelete(todo.id)}
+            disabled={editId === todo.id}
+          />
         </li>
       ))}
     </ul>

@@ -8,6 +8,7 @@
     "skipLibCheck": true,
     "baseUrl": "./",
     "paths": {
+      "@ui/*": ["src/components/shared/*"],
       "@components/*": ["src/components/*"],
       "@interfaces/*": ["src/interfaces/*"],
       "@hooks/*": ["src/hooks/*"],

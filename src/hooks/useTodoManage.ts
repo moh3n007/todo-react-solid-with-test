@@ -1,26 +1,51 @@
 // hooks
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 // types
-import type { ToDo } from "@interfaces/todoProps";
+import type { TodoProps, TodoFormData } from "@interfaces/todoProps";
+import type { SubmitHandler } from "react-hook-form";
+
+// validation
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
+
+const schema = Yup.object().shape({
+  text: Yup.string()
+    .required("Name is required")
+    .min(2, "Name must be at least 2 characters"),
+});
 
 const useTodoManage = () => {
-  const [todos, setTodos] = useState<ToDo[]>([]);
-  const [text, setText] = useState<string>("");
-  const [editId, setEditId] = useState<number | null>(null);
+  const defaultValues: TodoFormData = {
+    text: "",
+  };
 
-  const handleAddOrEdit = () => {
+  const handleCancelEdit = () => {
+    setEditId(null);
+    reset();
+  };
+
+  const handleAddOrEdit: SubmitHandler<TodoFormData> = ({ text }) => {
     if (editId !== null) {
       const updatedTodos = todos.map((todo) =>
         todo.id === editId ? { ...todo, text } : todo
       );
       setTodos(updatedTodos);
-      setEditId(null);
+      handleCancelEdit();
     } else {
       setTodos([...todos, { id: Date.now(), text }]);
     }
-    setText("");
+    reset();
   };
+
+  const { handleSubmit, reset, setValue, ...rest } = useForm({
+    defaultValues,
+    resolver: yupResolver(schema),
+  });
+
+  const [todos, setTodos] = useState<TodoProps[]>([]);
+  const [editId, setEditId] = useState<number | null>(null);
 
   const handleDelete = (id: number) => {
     setTodos(todos.filter((todo) => todo.id !== id));
@@ -29,8 +54,8 @@ const useTodoManage = () => {
   const handleEdit = (id: number) => {
     const todo = todos.find((todo) => todo.id === id);
     if (todo) {
-      setText(todo.text);
       setEditId(id);
+      setValue("text", todo.text);
     }
   };
 
@@ -38,10 +63,10 @@ const useTodoManage = () => {
     todos,
     handleDelete,
     handleEdit,
-    handleAddOrEdit,
-    text,
-    setText,
+    handleCancelEdit,
     editId,
+    onSubmit: handleSubmit(handleAddOrEdit),
+    ...rest,
   };
 };
 
