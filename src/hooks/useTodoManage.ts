@@ -39,7 +39,7 @@ const useTodoManage = () => {
     reset();
   };
 
-  const { handleSubmit, reset, setValue, ...rest } = useForm({
+  const { handleSubmit, reset, setValue, clearErrors, ...rest } = useForm({
     defaultValues,
     resolver: yupResolver(schema),
   });
@@ -57,6 +57,7 @@ const useTodoManage = () => {
       setEditId(id);
       setValue("text", todo.text);
     }
+    clearErrors();
   };
 
   return {
